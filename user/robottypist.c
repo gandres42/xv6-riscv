@@ -68,9 +68,12 @@ int main(int argc, char *argv[])
         exit(-1);
     }
 
+    // read arguments
     int runtime = atoi(argv[1]);
     int interval = atoi(argv[2]);
 
+    // A => runtime, B => interval
+    // Checks and warns about mismatching interval/runtime and runtimes less than intervals
     if (runtime < interval)
     {
         printf("Warning: runtime is less than typing interval, runtime will default to %d\n", interval);
@@ -89,16 +92,19 @@ int main(int argc, char *argv[])
         close(fd1[0]);
         close(fd2[0]);
         
+        // record start time to measure runtime
         int start_time = uptime() / 10;
         while (1)
         {
+            // print hello and write to the input pipe
             printf("Hello!\n");
             write(fd1[1], "Hello!", 6);
             
+            // sleep between typing intervals
             sleep(interval * 10);
 
-            // check for exit
-            if (runtime != -1 && (uptime() / 10) - start_time >= runtime)
+            // check for exit, exit if past runtime
+            if ((uptime() / 10) - start_time >= runtime)
             {
                 // here, take this
                 write(fd2[1], "L", 1);
