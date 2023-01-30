@@ -61,18 +61,27 @@ int main(int argc, char *argv[])
     pipe1(fd1); // a pipe from child to parent - child sends entered texts to parent for counting
     pipe1(fd2); // a pipe from child to parent - child lets parent stop (when user types :exit)
 
-    int runtime = -1;
-    int interval = 6;
-    if (argc >= 2)
+    if (argc < 3)
     {
-        runtime = atoi(argv[1]);
+        printf("Error: missing arguments");
+        printf("Usage: robottypist [RUNTIME] [TYPING INTERVAL]\n");
+        exit(-1);
     }
-    if (argc >= 3)
+
+    int runtime = atoi(argv[1]);
+    int interval = atoi(argv[2]);
+
+    if (runtime < interval)
     {
-        interval = atoi(argv[2]);
+        printf("Warning: runtime is less than typing interval, runtime will default to %d\n", interval);
+    }
+    else if (runtime % interval != 0)
+    {
+        printf("Warning: runtime is not a multiple of the typing interval, runtime will default to %d seconds\n", runtime + (runtime % interval));
     }
 
     int result = fork1(); // create child process
+
     if (result == 0)
     {
         // child process:
@@ -91,6 +100,7 @@ int main(int argc, char *argv[])
             // check for exit
             if (runtime != -1 && (uptime() / 10) - start_time >= runtime)
             {
+                // here, take this
                 write(fd2[1], "L", 1);
                 exit(0);
             }
