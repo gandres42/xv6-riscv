@@ -69,12 +69,17 @@ int main(int argc, char *argv[])
     }
 
     // read arguments
-    int runtime = atoi(argv[1]);
-    int interval = atoi(argv[2]);
+    int runtime = atoi(argv[1]) * 10;
+    int interval = atoi(argv[2]) * 10;
 
     // A => runtime, B => interval
     // Checks and warns about mismatching interval/runtime
-    if (runtime < 6)
+    if (interval < 10)
+    {
+        printf("Error: typing interval must be a positive nonzero integer\n");
+        exit(-1);
+    }
+    if (runtime < 60)
     {
         printf("Warning: runtime is less than 6 seconds, final character count will not be displayed before ending\n");
     }
@@ -85,7 +90,7 @@ int main(int argc, char *argv[])
 
     // create child process
     int result = fork1();
-
+    
     if (result == 0)
     {
         // child process:
@@ -94,39 +99,43 @@ int main(int argc, char *argv[])
         close(fd2[0]);
         
         // record start time to measure runtime
-        int start_time = uptime() / 10;
-        int interval_time = uptime() / 10;
+        int start_time = uptime();
+        int interval_time = uptime();
         while (1)
         {
+            // use local variable to prevent uptime from chaning between the statements
+            int current_time = uptime();
+
+            // print hello and write to the input pipe
+            if (current_time - interval_time >= interval)
+            {
+                printf("Hello!\n");
+                write(fd1[1], "Hello!", 6);
+                interval_time += interval;
+            }
+
             // check for exit, exit if past runtime
-            if ((uptime() / 10) - start_time >= runtime)
+            if (current_time - start_time >= runtime)
             {
                 sleep(10);
                 // here, take this
                 write(fd2[1], "L", 1);
                 exit(0);
             }
-            
-            // print hello and write to the input pipe
-            if ((uptime() / 10) - interval_time >= interval)
-            {
-                printf("Hello!\n");
-                write(fd1[1], "Hello!", 6);
-                interval_time += interval;
-            }
         }
     }
     else
     {
         // parent process:
-        int start_time = uptime();
+        int summary_time = uptime();
         while (1)
         {
-            if (uptime() - start_time >= 60)
+            if (uptime() - summary_time >= 60)
             {
+                // sleep to prevent printf statements overwriting each other, or function exiting before printing
                 sleep(1);
                 printf("\nIn last minute, %d characters were entered.\n", read1(fd1));
-                start_time += 60;
+                summary_time += 60;
             }
 
             if (read1(fd2) > 0)
