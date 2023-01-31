@@ -116,15 +116,12 @@ int main(int argc, char *argv[])
     {
         // parent process:
         int start_time = uptime();
-        int looping_len = 0;
         while (1)
         {
-            looping_len += read1(fd1);
             if (uptime() - start_time >= 60)
             {
-                printf("\nIn last minute, %d characters were entered.\n", looping_len);
+                printf("\nIn last minute, %d characters were entered.\n", read1(fd1));
                 start_time = uptime();
-                looping_len = 0;
             }
 
             if (read1(fd2) > 0)
