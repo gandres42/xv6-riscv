@@ -73,14 +73,14 @@ int main(int argc, char *argv[])
     int interval = atoi(argv[2]);
 
     // A => runtime, B => interval
-    // Checks and warns about mismatching interval/runtime and runtimes less than intervals
-    if (runtime < interval)
+    // Checks and warns about mismatching interval/runtime
+    if (runtime < 6)
     {
-        printf("Warning: runtime is less than typing interval, runtime will default to %d\n", interval);
+        printf("Warning: runtime is less than 6 seconds, final character count will not be displayed before ending\n");
     }
-    else if (runtime % interval != 0)
+    if (runtime % interval != 0)
     {
-        printf("Warning: runtime is not a multiple of the typing interval, runtime will default to %d seconds\n", runtime + (runtime % interval));
+        printf("Warning: runtime is not a multiple of the typing interval, final character count will not be displayed\n");
     }
 
     int result = fork1(); // create child process
@@ -96,13 +96,6 @@ int main(int argc, char *argv[])
         int start_time = uptime() / 10;
         while (1)
         {
-            // print hello and write to the input pipe
-            printf("Hello!\n");
-            write(fd1[1], "Hello!", 6);
-            
-            // sleep between typing intervals
-            sleep(interval * 10);
-
             // check for exit, exit if past runtime
             if ((uptime() / 10) - start_time >= runtime)
             {
@@ -110,20 +103,31 @@ int main(int argc, char *argv[])
                 write(fd2[1], "L", 1);
                 exit(0);
             }
+            
+            // print hello and write to the input pipe
+            printf("Hello!\n");
+            write(fd1[1], "Hello!", 6);
+            
+            // sleep between typing intervals
+            sleep(interval * 10);
         }
     }
     else
     {
         // parent process:
+        int start_time = uptime();
+        int looping_len = 0;
         while (1)
         {
-            sleep(6 * 10); // sleep between statements
+            looping_len += read1(fd1);
+            if (uptime() - start_time >= 60)
+            {
+                printf("\nIn last minute, %d characters were entered.\n", looping_len);
+                start_time = uptime();
+                looping_len = 0;
+            }
 
-            int len = read1(fd1);
-            printf("\nIn last minute, %d characters were entered.\n", len);
-
-            len = read1(fd2);
-            if (len > 0)
+            if (read1(fd2) > 0)
             {
                 // now to terminate
                 wait(0);
