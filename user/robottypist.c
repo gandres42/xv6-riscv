@@ -83,7 +83,8 @@ int main(int argc, char *argv[])
         printf("Warning: runtime is not a multiple of the typing interval, final character count will not be displayed\n");
     }
 
-    int result = fork1(); // create child process
+    // create child process
+    int result = fork1();
 
     if (result == 0)
     {
@@ -94,22 +95,25 @@ int main(int argc, char *argv[])
         
         // record start time to measure runtime
         int start_time = uptime() / 10;
+        int interval_time = uptime() / 10;
         while (1)
         {
             // check for exit, exit if past runtime
             if ((uptime() / 10) - start_time >= runtime)
             {
+                sleep(10);
                 // here, take this
                 write(fd2[1], "L", 1);
                 exit(0);
             }
             
             // print hello and write to the input pipe
-            printf("Hello!\n");
-            write(fd1[1], "Hello!", 6);
-            
-            // sleep between typing intervals
-            sleep(interval * 10);
+            if ((uptime() / 10) - interval_time >= interval)
+            {
+                printf("Hello!\n");
+                write(fd1[1], "Hello!", 6);
+                interval_time += interval;
+            }
         }
     }
     else
@@ -120,13 +124,13 @@ int main(int argc, char *argv[])
         {
             if (uptime() - start_time >= 60)
             {
+                sleep(1);
                 printf("\nIn last minute, %d characters were entered.\n", read1(fd1));
-                start_time = uptime();
+                start_time += 60;
             }
 
             if (read1(fd2) > 0)
             {
-                // now to terminate
                 wait(0);
                 exit(0);
             }
