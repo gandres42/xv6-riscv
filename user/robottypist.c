@@ -63,7 +63,7 @@ int main(int argc, char *argv[])
 
     if (argc < 3)
     {
-        printf("Error: missing arguments");
+        printf("Error: missing arguments\n");
         printf("Usage: robottypist [RUNTIME] [TYPING INTERVAL]\n");
         exit(-1);
     }
@@ -71,6 +71,7 @@ int main(int argc, char *argv[])
     // read arguments
     int runtime = atoi(argv[1]) * 10;
     int interval = atoi(argv[2]) * 10;
+    printf("%d\n", runtime);
 
     // A => runtime, B => interval
     // Checks and warns about mismatching interval/runtime
@@ -83,9 +84,9 @@ int main(int argc, char *argv[])
     {
         printf("Warning: runtime is less than 6 seconds, final character count will not be displayed before ending\n");
     }
-    if (runtime % interval != 0)
+    if (runtime % 60 != 0)
     {
-        printf("Warning: runtime is not a multiple of the typing interval, final character count will not be displayed\n");
+        printf("Warning: runtime is not a multiple of 6 seconds, final character count will not be displayed\n");
     }
 
     // create child process
