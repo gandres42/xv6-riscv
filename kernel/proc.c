@@ -169,6 +169,7 @@ freeproc(struct proc *p)
   p->killed = 0;
   p->xstate = 0;
   p->state = UNUSED;
+  p->swapcount = 0;
 }
 
 // Create a user page table for a given process, with no user memory,
@@ -483,6 +484,7 @@ sched(void)
 {
   int intena;
   struct proc *p = myproc();
+  p->swapcount++;
 
   if(!holding(&p->lock))
     panic("sched p->lock");
@@ -681,3 +683,79 @@ procdump(void)
     printf("\n");
   }
 }
+
+uint64 
+sys_getppid(void) 
+{  
+  struct proc * current_proc = myproc();
+  if (current_proc == 0)
+  {
+    return 0;
+  }
+  struct proc * parent_proc = current_proc->parent;
+  return parent_proc->pid;
+}
+
+uint64 
+sys_getcpids(void) 
+{ 
+  int child_pids[64];  
+  int number=0; 
+  
+  //get the caller’s struct proc 
+  struct proc *p = myproc(); 
+  if (p == 0)
+  {
+    return 0;
+  }
+
+  /*TODO: 
+  (1) find the caller’s pid from its struct proc; 
+  (2) loop through the array proc (which is defined  
+  in proc.c as well) to find all the processes whose parent  
+  is the caller (i.e., whose parent’s pid equals to  
+  the caller’s pid), count the number of these processes  
+  at variable number, and record their pids  
+  to array child_pids. 
+  */
+  //get the argument (i.e., address of an array)  
+  //passed by the caller 
+
+  int caller_pid = p->pid;
+  for (int i = 0; i < NPROC; i++)
+  {
+    if (proc[i].parent->pid == caller_pid)
+    {
+      child_pids[number] = proc[i].pid;
+      number++;
+    }
+  }
+
+  uint64 user_array; 
+  argaddr(0, &user_array); 
+
+  //copy array child_pids from kernel memory  
+  //to user memory with address user_array 
+  if (copyout(p->pagetable, user_array, (char *)child_pids, number*sizeof(int)) < 0) 
+    return -1; 
+
+  // TODO: return the number of child processes found. 
+  return number;
+}
+
+int 
+sys_getswapcount(void) { 
+   
+// TODO:  
+   // (1) call myproc() to get the caller’s struct proc 
+   // (2) return the value of field “swapcount” in struct proc 
+  struct proc * p = myproc();
+  if (p == 0)
+  {
+    return 0;
+  }
+  else
+  {
+    return p->swapcount;
+  }
+} 
