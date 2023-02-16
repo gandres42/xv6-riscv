@@ -134,6 +134,7 @@ UPROGS=\
 	$U/_zombie\
 	$U/_typist\
 	$U/_robottypist\
+	$U/_systest\
 
 fs.img: mkfs/mkfs README $(UPROGS)
 	mkfs/mkfs fs.img README $(UPROGS)

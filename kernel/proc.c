@@ -684,6 +684,7 @@ procdump(void)
   }
 }
 
+// gets the current running process and if valid returns the PID
 uint64 
 sys_getppid(void) 
 {  
@@ -696,10 +697,12 @@ sys_getppid(void)
   return parent_proc->pid;
 }
 
+// iterate over all processes in kernel stack and return child count of current process
+// reads found children into buffer passed to function
 uint64 
 sys_getcpids(void) 
-{ 
-  int child_pids[64];  
+{
+  int child_pids[64];
   int number=0; 
   
   //get the caller’s struct proc 
@@ -709,22 +712,11 @@ sys_getcpids(void)
     return 0;
   }
 
-  /*TODO: 
-  (1) find the caller’s pid from its struct proc; 
-  (2) loop through the array proc (which is defined  
-  in proc.c as well) to find all the processes whose parent  
-  is the caller (i.e., whose parent’s pid equals to  
-  the caller’s pid), count the number of these processes  
-  at variable number, and record their pids  
-  to array child_pids. 
-  */
-  //get the argument (i.e., address of an array)  
-  //passed by the caller 
-
   int caller_pid = p->pid;
+  
   for (int i = 0; i < NPROC; i++)
   {
-    if (proc[i].parent->pid == caller_pid)
+    if (proc[i].parent != 0 && proc[i].parent->pid == caller_pid)
     {
       child_pids[number] = proc[i].pid;
       number++;
@@ -739,16 +731,12 @@ sys_getcpids(void)
   if (copyout(p->pagetable, user_array, (char *)child_pids, number*sizeof(int)) < 0) 
     return -1; 
 
-  // TODO: return the number of child processes found. 
   return number;
 }
 
+// 
 int 
 sys_getswapcount(void) { 
-   
-// TODO:  
-   // (1) call myproc() to get the caller’s struct proc 
-   // (2) return the value of field “swapcount” in struct proc 
   struct proc * p = myproc();
   if (p == 0)
   {
