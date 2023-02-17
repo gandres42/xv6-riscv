@@ -684,14 +684,14 @@ procdump(void)
   }
 }
 
-// gets the current running process and if valid returns the PID
+// gets the current running process and if valid returns the PID, else returns -1
 uint64 
 sys_getppid(void) 
 {  
   struct proc * current_proc = myproc();
   if (current_proc == 0)
   {
-    return 0;
+    return -1;
   }
   struct proc * parent_proc = current_proc->parent;
   return parent_proc->pid;
@@ -699,6 +699,7 @@ sys_getppid(void)
 
 // iterate over all processes in kernel stack and return child count of current process
 // reads found children into buffer passed to function
+// if the current process is invalid, returns -1
 uint64 
 sys_getcpids(void) 
 {
@@ -709,7 +710,7 @@ sys_getcpids(void)
   struct proc *p = myproc(); 
   if (p == 0)
   {
-    return 0;
+    return -1;
   }
 
   int caller_pid = p->pid;
@@ -734,7 +735,8 @@ sys_getcpids(void)
   return number;
 }
 
-// 
+// return number of times the current process has been swapped off the CPU
+// swapcount is iterated once every time sched() is run, taking the process off the CPU
 int 
 sys_getswapcount(void) { 
   struct proc * p = myproc();
