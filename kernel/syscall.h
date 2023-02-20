@@ -20,6 +20,7 @@
 #define SYS_link   19
 #define SYS_mkdir  20
 #define SYS_close  21
+// array indeces for new helper functions
 #define SYS_getppid 22 
 #define SYS_getcpids 23 
 #define SYS_getswapcount 24

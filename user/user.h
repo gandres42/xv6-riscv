@@ -22,6 +22,7 @@ int getpid(void);
 char* sbrk(int);
 int sleep(int);
 int uptime(void);
+// new helper functions to get information about currently running process
 int getppid(void); 
 int getcpids(int *cpids); 
 int getswapcount(void);
