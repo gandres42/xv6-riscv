@@ -81,7 +81,7 @@ int main(int argc, char *argv[])
     }
     if (runtime < 60)
     {
-        printf("Warning: runtime is less than 6 seconds, final character count will not be displayed before ending\n");
+        printf("Warning: runtime is less than 60 seconds, final character count will not be displayed before ending\n");
     }
     if (runtime % 60 != 0)
     {
