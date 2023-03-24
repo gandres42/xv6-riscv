@@ -541,8 +541,15 @@ void cfs_scheduler(struct cpu *c)
     if (sp != 0)
     { 
       cfs_current_proc = sp;
+      // printf("yee haw: %d\n", weight_sum());
+      // printf("%d\n", cfs_sched_latency * nice_to_weight[sp->nice + 20] % weight_sum());
       cfs_proc_timeslice_len = (cfs_sched_latency * nice_to_weight[sp->nice + 20]) / weight_sum();
-      cfs_proc_timeslice_len += (cfs_sched_latency * nice_to_weight[sp->nice + 20]) % weight_sum();
+      if ((cfs_sched_latency * nice_to_weight[sp->nice + 20]) % weight_sum() != 0)
+      {
+        cfs_proc_timeslice_len += 1;
+      }
+      // cfs_proc_timeslice_len += (cfs_sched_latency * nice_to_weight[sp->nice + 20]) % weight_sum();
+      // printf("yar har: %d\n", cfs_proc_timeslice_len);
       if (cfs_proc_timeslice_len > cfs_max_timeslice)
       {
         cfs_proc_timeslice_len = cfs_max_timeslice;
