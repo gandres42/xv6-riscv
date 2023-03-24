@@ -41,3 +41,8 @@ entry("uptime");
 entry("getppid");
 entry("getcpids");
 entry("getswapcount");
+
+# system calls for cfs
+entry("nice");
+entry("startcfs");
+entry("stopcfs");

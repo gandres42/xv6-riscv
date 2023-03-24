@@ -107,4 +107,8 @@ struct proc {
 
   // track number of times the process if swapped off CPU
   int swapcount;
+
+  // values used for fair scheduler
+  int nice;
+  int vruntime;
 };

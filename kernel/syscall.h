@@ -24,3 +24,7 @@
 #define SYS_getppid 22 
 #define SYS_getcpids 23 
 #define SYS_getswapcount 24
+// cfs helper syscalls
+#define SYS_nice 25
+#define SYS_startcfs 26
+#define SYS_stopcfs 27

@@ -26,6 +26,10 @@ int uptime(void);
 int getppid(void); 
 int getcpids(int *cpids); 
 int getswapcount(void);
+// cfs helper system calls
+int nice(int new_nice);
+int startcfs(void);
+int stopcfs(void);
 
 // ulib.c
 int stat(const char*, struct stat*);
