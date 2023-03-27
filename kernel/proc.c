@@ -542,11 +542,9 @@ void cfs_scheduler(struct cpu *c)
     { 
       cfs_current_proc = sp;
       int sum = weight_sum();
-      // acquire(&sp->lock);
-      int tmp_nice = sp->nice;
-      cfs_proc_timeslice_len = cfs_sched_latency * nice_to_weight[tmp_nice + 20] / sum;
-      tmp_nice = sp->nice;
-      if (cfs_sched_latency * nice_to_weight[tmp_nice + 20] % sum != 0)
+      acquire(&sp->lock);
+      cfs_proc_timeslice_len = cfs_sched_latency * nice_to_weight[sp->nice + 20] / sum;
+      if (cfs_sched_latency * nice_to_weight[sp->nice + 20] % sum != 0)
       {
         cfs_proc_timeslice_len += 1;
       }
@@ -560,7 +558,7 @@ void cfs_scheduler(struct cpu *c)
         cfs_proc_timeslice_len = cfs_min_timeslice;
       }
       cfs_proc_timeslice_left = cfs_proc_timeslice_len - sp->vruntime;
-      // release(&sp->lock);
+      release(&sp->lock);
       c->proc = sp;
     }
 
