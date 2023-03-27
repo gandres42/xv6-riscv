@@ -1,5 +1,13 @@
 Gavin Andres - a fork of xv6-risv for COMS-352
 CHANGELOG --------------------------------------------------------------------------------------------------------
+Project 1C:
+    - Added system calls nice, startcfs, stopcfs
+      nice returns the nice score for the current process
+      startcfs changes the scheduler from the original RR to CFS
+      stopcfs sets the scheduler to the original RR
+    - Add CFS scheduler to proc.c, replacing original scheulder function with toggle for scheduler functions that
+      swaps between the RR and CFS schedulers 
+    - Add program testsyscall, which spawns 10 child processes and runs the CFS scheduler
 Project 1B:
     - Added system calls getppid, getcpid, and getswapcount
       getppid returns pid of current process, -1 on failure

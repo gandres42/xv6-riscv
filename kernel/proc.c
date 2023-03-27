@@ -461,7 +461,7 @@ wait(uint64 addr)
   }
 }
 
-// TODO
+// iterates over all runnable processes and returns the sum of their weights
 int weight_sum()
 {
   struct proc *p;
@@ -478,7 +478,7 @@ int weight_sum()
   return total_weight;
 }
 
-// TODO
+// iterates over all runnable processes and returns a pointer to the one with the smallest vruntime
 struct proc * shortest_runtime_proc()
 {
   struct proc *p;
@@ -498,6 +498,7 @@ struct proc * shortest_runtime_proc()
   return sp;
 }
 
+// implementation of the CFS scheduler, called by the scheduler function when enabled using variable cfs
 void cfs_scheduler(struct cpu *c) 
 { 
   //initialize c->proc, which is the process to be run in the next timeslice 
@@ -914,11 +915,12 @@ sys_nice(void)
   return p->nice;
 }
 
+// system calls to enable or disable CFS scheduler by setting the variable cfs
+// if disabled, scheduler defaults to the original xv6 RR scheduler
 int
 sys_startcfs(void)
 {
   cfs = 1;
-
   return 1;
 }
 
