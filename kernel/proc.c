@@ -529,15 +529,14 @@ void cfs_scheduler(struct cpu *c)
     
   if(c->proc==0)
   {  
-    //to add:  
-    //(1) Call shortest_runtime_proc() to get the proc with the shorestest vruntime 
+    // Call shortest_runtime_proc() to get the proc with the shorestest vruntime 
     struct proc * sp = shortest_runtime_proc();
 
-    //(2) If (1) returns a valid process, set up cfs_current_proc, cfs_proc_timeslice_len, 
-    //    cfs_proc_timeslice_left and c->proc accordingly.  
-    //    Notes: according to CFS, a process is assigned with time slice of  
-    //    ceil(cfs_sched_latency * weight_of_this_process / weights_of_all_runnable_process) 
-    //    and the timeslice length should be in [cfs_min_timeslice, cfs_max_timeslice] 
+    // If (1) returns a valid process, set up cfs_current_proc, cfs_proc_timeslice_len, 
+    // cfs_proc_timeslice_left and c->proc accordingly.  
+    // Notes: according to CFS, a process is assigned with time slice of  
+    // ceil(cfs_sched_latency * weight_of_this_process / weights_of_all_runnable_process) 
+    // and the timeslice length should be in [cfs_min_timeslice, cfs_max_timeslice] 
     if (sp != 0)
     { 
       cfs_current_proc = sp;
@@ -559,8 +558,6 @@ void cfs_scheduler(struct cpu *c)
       
       c->proc = sp;
     }
-
-    //(3) If (1) returns 0, do nothing.
 
     if(c->proc > 0)
     { 
