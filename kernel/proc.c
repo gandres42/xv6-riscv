@@ -557,6 +557,7 @@ void cfs_scheduler(struct cpu *c)
       {
         cfs_proc_timeslice_len = cfs_min_timeslice;
       }
+      
       cfs_proc_timeslice_left = cfs_proc_timeslice_len - sp->vruntime;
       release(&sp->lock);
       c->proc = sp;
