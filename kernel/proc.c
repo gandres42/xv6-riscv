@@ -468,11 +468,11 @@ int weight_sum()
   int total_weight = 0;
 
   for(p = proc; p < &proc[NPROC]; p++) {
-    acquire(&p->lock);
+    // acquire(&p->lock);
     if(p->state == RUNNABLE) {
       total_weight += nice_to_weight[p->nice + 20];
     }
-    release(&p->lock);
+    // release(&p->lock);
   }
 
   return total_weight;
@@ -485,14 +485,14 @@ struct proc * shortest_runtime_proc()
   struct proc *sp = 0;
 
   for(p = proc; p < &proc[NPROC]; p++) {
-    acquire(&p->lock);
+    // acquire(&p->lock);
     if(p->state == RUNNABLE) {
       if (sp == 0 || p->vruntime < sp->vruntime)
       {
         sp = p; 
       }
     }
-    release(&p->lock);
+    // release(&p->lock);
   }
 
   return sp;
@@ -543,15 +543,10 @@ void cfs_scheduler(struct cpu *c)
       cfs_current_proc = sp;
       int sum = weight_sum();
       cfs_proc_timeslice_len = cfs_sched_latency * nice_to_weight[sp->nice + 20] / sum;
-      // if (cfs_sched_latency * nice_to_weight[sp->nice + 20] % sum != 0)
-      // {
-      //   cfs_proc_timeslice_len += 1;
-      // }
-
-      
-
-      cfs_proc_timeslice_left = cfs_proc_timeslice_len - sp->vruntime;
-
+      if (cfs_sched_latency * nice_to_weight[sp->nice + 20] % sum != 0)
+      {
+        cfs_proc_timeslice_len += 1;
+      }
       if (cfs_proc_timeslice_len > cfs_max_timeslice)
       {
         cfs_proc_timeslice_len = cfs_max_timeslice;
@@ -559,11 +554,10 @@ void cfs_scheduler(struct cpu *c)
       else if (cfs_proc_timeslice_len < cfs_min_timeslice)
       {
         cfs_proc_timeslice_len = cfs_min_timeslice;
-      }
+      }     
+      cfs_proc_timeslice_left = cfs_proc_timeslice_len;
       
-      acquire(&sp->lock);
       c->proc = sp;
-      release(&sp->lock);
     }
 
     //(3) If (1) returns 0, do nothing.
